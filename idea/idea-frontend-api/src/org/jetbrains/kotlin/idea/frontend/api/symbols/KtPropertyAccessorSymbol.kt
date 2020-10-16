@@ -7,12 +7,16 @@ package org.jetbrains.kotlin.idea.frontend.api.symbols
 
 import org.jetbrains.kotlin.idea.frontend.api.symbols.markers.KtCommonSymbolModality
 import org.jetbrains.kotlin.idea.frontend.api.symbols.markers.KtSymbolWithModality
+import org.jetbrains.kotlin.idea.frontend.api.symbols.markers.KtSymbolWithVisibility
 import org.jetbrains.kotlin.idea.frontend.api.symbols.markers.KtTypedSymbol
 import org.jetbrains.kotlin.idea.frontend.api.symbols.pointers.KtSymbolPointer
 
-sealed class KtPropertyAccessorSymbol : KtSymbol,
-    KtSymbolWithModality<KtCommonSymbolModality> {
+sealed class KtPropertyAccessorSymbol : KtFunctionLikeSymbol(),
+    KtSymbolWithModality<KtCommonSymbolModality>,
+    KtSymbolWithVisibility {
     abstract val isDefault: Boolean
+    abstract val isInline: Boolean
+    abstract val isOverride: Boolean
 
     abstract override fun createPointer(): KtSymbolPointer<KtPropertyAccessorSymbol>
 }
