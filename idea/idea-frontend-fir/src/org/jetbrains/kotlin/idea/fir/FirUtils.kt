@@ -37,7 +37,8 @@ internal fun FirReference.getResolvedKtSymbolOfNameReference(builder: KtSymbolBy
         builder.buildSymbol(firDeclaration)
     }
 
-internal inline fun <reified D> D.unrollFakeOverrides(): D where D : FirDeclaration, D : FirSymbolOwner<*> {
+internal inline fun <reified D> D.unrollFakeOverrides(): D where D : FirDeclaration {
+    check(this is FirSymbolOwner<*>)
     val symbol = symbol
     if (symbol !is PossiblyFirFakeOverrideSymbol<*, *>) return this
     if (!symbol.isFakeOrIntersectionOverride) return this
