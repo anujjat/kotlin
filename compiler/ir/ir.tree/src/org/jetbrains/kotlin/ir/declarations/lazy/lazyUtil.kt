@@ -36,9 +36,9 @@ private class SynchronizedLazyVar<T>(initializer: () -> T) : ReadWriteProperty<A
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-//        synchronized(this) {
+        synchronized(this) {
             this._value = value
             isInitialized = true
-//        }
+        }
     }
 }
