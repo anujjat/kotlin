@@ -16,10 +16,12 @@
 
 package org.jetbrains.kotlin.psi2ir.generators
 
+import org.jetbrains.kotlin.backend.common.CodegenUtil
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.diagnostics.PsiDiagnosticUtils
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
@@ -59,12 +61,20 @@ class DeclarationGenerator(override val context: GeneratorContext) : Generator {
                     )
             }
         } catch (e: Throwable) {
-            if (context.configuration.ignoreErrors) {
-                context.irFactory.createErrorDeclaration(
-                    ktDeclaration.startOffsetSkippingComments, ktDeclaration.endOffset,
-                    getOrFail(BindingContext.DECLARATION_TO_DESCRIPTOR, ktDeclaration)
-                )
-            } else throw e
+            when {
+                context.configuration.ignoreErrors -> {
+                    context.irFactory.createErrorDeclaration(
+                        ktDeclaration.startOffsetSkippingComments, ktDeclaration.endOffset,
+                        getOrFail(BindingContext.DECLARATION_TO_DESCRIPTOR, ktDeclaration)
+                    )
+                }
+                e is ErrorExpressionException ->
+                    CodegenUtil.reportBackendException(e.cause ?: e, "psi2ir", PsiDiagnosticUtils.atLocation(e.ktElement), e.message)
+                else -> {
+                    val psiFile = ktDeclaration.containingKtFile
+                    CodegenUtil.reportBackendException(e, "psi2ir", psiFile.virtualFile?.path ?: psiFile.name)
+                }
+            }
         }
     }
 

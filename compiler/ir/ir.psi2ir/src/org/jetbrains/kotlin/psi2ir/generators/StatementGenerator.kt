@@ -73,6 +73,8 @@ class StatementGenerator(
     private fun KtElement.genStmt(): IrStatement =
         try {
             deparenthesize().accept(this@StatementGenerator, null)
+        } catch (e: ErrorExpressionException) {
+            throw e
         } catch (e: Throwable) {
             ErrorExpressionGenerator(this@StatementGenerator).generateErrorExpression(this, e)
         }

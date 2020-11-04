@@ -232,12 +232,13 @@ object CodegenUtil {
     }
 
     @JvmStatic
-    fun reportBackendException(exception: Throwable, phase: String, fileUrl: String?): Nothing {
+    fun reportBackendException(exception: Throwable, phase: String, fileUrl: String?, additionalMessage: String? = null): Nothing {
         // CompilationException (the only KotlinExceptionWithAttachments possible here) is already supposed
         // to have all information about the context.
         if (exception is KotlinExceptionWithAttachments) throw exception
         throw IllegalStateException(
-            getExceptionMessage("Backend", "Exception during $phase", exception, fileUrl),
+            getExceptionMessage("Backend", "Exception during $phase", exception, fileUrl) +
+                    additionalMessage?.let { "\n" + it }.orEmpty(),
             exception
         )
     }
