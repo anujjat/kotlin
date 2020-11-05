@@ -1,0 +1,14 @@
+@kotlin.Metadata
+public final class test/A {
+    // source: 'part.kt'
+    public deprecated final static @kotlin.Deprecated method f(): void
+    public deprecated final static @org.jetbrains.annotations.NotNull method getStr(): java.lang.String
+}
+
+@kotlin.Metadata
+synthetic final class test/A__PartKt {
+    // source: 'part.kt'
+    public deprecated final static @kotlin.Deprecated method f(): void
+    public synthetic deprecated static @kotlin.Deprecated method getStr$annotations(): void
+    public deprecated final static @org.jetbrains.annotations.NotNull method getStr(): java.lang.String
+}
