@@ -119,7 +119,7 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
         description = "When using the IR backend, run lowerings by file in N parallel threads.\n" +
                       "Default value is 1"
     )
-    var threadsForFileLowerings: String by FreezableVar("1")
+    var threadsForFileLowerings: String by FreezableVar("8")
 
     @Argument(value = "-Xmodule-path", valueDescription = "<path>", description = "Paths where to find Java 9+ modules")
     var javaModulePath: String? by NullableStringFreezableVar(null)
