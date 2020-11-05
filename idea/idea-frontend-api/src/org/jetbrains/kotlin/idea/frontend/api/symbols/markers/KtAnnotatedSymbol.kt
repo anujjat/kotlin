@@ -17,10 +17,10 @@ abstract class KtAnnotationCall {
     abstract val arguments: List<KtNamedConstantValue>
 }
 
-interface KtConstantValue
-object KtUnsupportedConstantValue : KtConstantValue
+sealed class KtConstantValue
+object KtUnsupportedConstantValue : KtConstantValue()
 
-data class KtSimpleConstantValue<T>(val constant: T) : KtConstantValue
+data class KtSimpleConstantValue<T>(val constant: T) : KtConstantValue()
 data class KtNamedConstantValue(val name: String, val expression: KtConstantValue)
 
 interface KtAnnotatedSymbol : KtSymbol {

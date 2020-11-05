@@ -40,13 +40,6 @@ internal class KtFirPropertyGetterSymbol(
     override val isInline: Boolean get() = firRef.withFir { it.isInline }
     override val isOverride: Boolean get() = firRef.withFir { it.isOverride }
 
-    override val valueParameters: List<KtFirFunctionValueParameterSymbol> by firRef.withFirAndCache { fir ->
-        fir.valueParameters.map { valueParameter ->
-            check(valueParameter is FirValueParameterImpl)
-            builder.buildParameterSymbol(valueParameter)
-        }
-    }
-
     override val symbolKind: KtSymbolKind
         get() = firRef.withFir { fir ->
             when (fir.symbol.callableId.classId) {

@@ -53,7 +53,7 @@ abstract class KtPropertySymbol : KtVariableSymbol(),
 
     abstract val hasBackingField: Boolean
 
-    abstract val hasConstModifier: Boolean
+    abstract val isConst: Boolean
 
     abstract val isOverride: Boolean
 

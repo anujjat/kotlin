@@ -33,8 +33,9 @@ internal fun Visibility?.getSymbolVisibility(): KtSymbolVisibility = when (this)
     Visibilities.Protected -> KtSymbolVisibility.PROTECTED
     Visibilities.Private -> KtSymbolVisibility.PRIVATE
     Visibilities.Internal -> KtSymbolVisibility.INTERNAL
+    Visibilities.Unknown -> KtSymbolVisibility.UNKNOWN
     null -> error("Symbol visibility should not be null, looks like the fir symbol was not properly resolved")
-    else -> throw NotImplementedError()
+    else -> throw NotImplementedError("Unknown visibility $name")
 }
 
 internal fun <F : FirMemberDeclaration> KtFirSymbol<F>.getVisibility(): KtSymbolVisibility =

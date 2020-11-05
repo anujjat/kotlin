@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.psi.KtCallElement
 
 class KtFirAnnotationCall(
-    override val classId: ClassId?,
+    override val classId: ClassId,
     override val useSiteTarget: AnnotationUseSiteTarget?,
     override val psi: KtCallElement?,
     override val arguments: List<KtNamedConstantValue>
