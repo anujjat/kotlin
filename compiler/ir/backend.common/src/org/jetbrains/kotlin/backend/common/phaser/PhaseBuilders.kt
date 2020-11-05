@@ -14,7 +14,8 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import java.lang.IllegalStateException
-import kotlin.concurrent.thread
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 // Phase composition.
 private class CompositePhase<Context : CommonBackendContext, Input, Output>(
@@ -120,10 +121,13 @@ private class PerformByIrFilePhase<Context : CommonBackendContext>(
         phaserState: PhaserState<IrModuleFragment>,
         context: Context,
         input: IrModuleFragment
-    ): IrModuleFragment = if (context.configuration.getBoolean(CommonConfigurationKeys.RUN_LOWERINGS_IN_PARALLEL))
-        invokeParallel(phaseConfig, phaserState, context, input)
-    else
-        invokeSequential(phaseConfig, phaserState, context, input)
+    ): IrModuleFragment {
+        val nThreads = context.configuration.get(CommonConfigurationKeys.THREADS_FOR_FILE_LOWERINGS) ?: 1
+        return if (nThreads > 1)
+            invokeParallel(phaseConfig, phaserState, context, input, nThreads)
+        else
+            invokeSequential(phaseConfig, phaserState, context, input)
+    }
 
     private fun invokeSequential(
         phaseConfig: PhaseConfig, phaserState: PhaserState<IrModuleFragment>, context: Context, input: IrModuleFragment
@@ -143,7 +147,7 @@ private class PerformByIrFilePhase<Context : CommonBackendContext>(
     }
 
     private fun invokeParallel(
-        phaseConfig: PhaseConfig, phaserState: PhaserState<IrModuleFragment>, context: Context, input: IrModuleFragment
+        phaseConfig: PhaseConfig, phaserState: PhaserState<IrModuleFragment>, context: Context, input: IrModuleFragment, nThreads: Int
     ): IrModuleFragment {
         if (input.files.isEmpty()) return input
 
@@ -152,8 +156,10 @@ private class PerformByIrFilePhase<Context : CommonBackendContext>(
 
         // Each thread needs its own copy of phaserState.alreadyDone
         val filesAndStates = input.files.map { it to phaserState.clone() }
-        val threads = filesAndStates.map { (irFile, state) ->
-            thread {
+
+        val executor = Executors.newFixedThreadPool(nThreads)
+        for ((irFile, state) in filesAndStates) {
+            executor.execute {
                 try {
                     for (phase in lower) {
                         phase.invoke(phaseConfig, state.changeType(), context, irFile)
@@ -163,8 +169,8 @@ private class PerformByIrFilePhase<Context : CommonBackendContext>(
                 }
             }
         }
-
-        threads.forEach { it.join() }
+        executor.shutdown()
+        executor.awaitTermination(1, TimeUnit.DAYS) // Wait long enough
 
         if (thrownFromThread != null) throw IllegalStateException("Exception in file lowering", thrownFromThread)
 
