@@ -41,7 +41,7 @@ class TypeTranslator(
     private val typeApproximatorForNI = TypeApproximator(builtIns)
     lateinit var constantValueGenerator: ConstantValueGenerator
 
-    val symbolTableLock: Any = if (enterTableScope) symbolTable else object {}
+    val symbolTableLock: Any = if (enterTableScope) symbolTable.lock else object {}
 
     fun enterScope(irElement: IrTypeParametersContainer) {
         typeParametersResolver.enterTypeParameterScope(irElement)
