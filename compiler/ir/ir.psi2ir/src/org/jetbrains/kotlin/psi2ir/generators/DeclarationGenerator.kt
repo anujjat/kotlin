@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.psi2ir.generators
 
+import org.jetbrains.kotlin.backend.common.BackendException
 import org.jetbrains.kotlin.backend.common.CodegenUtil
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -60,6 +61,8 @@ class DeclarationGenerator(override val context: GeneratorContext) : Generator {
                         getOrFail(BindingContext.DECLARATION_TO_DESCRIPTOR, ktDeclaration)
                     )
             }
+        } catch (e: BackendException) {
+            throw e
         } catch (e: Throwable) {
             when {
                 context.configuration.ignoreErrors -> {

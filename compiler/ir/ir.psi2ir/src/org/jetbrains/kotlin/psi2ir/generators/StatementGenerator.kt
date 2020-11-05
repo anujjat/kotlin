@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.psi2ir.generators
 
+import org.jetbrains.kotlin.backend.common.BackendException
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -73,6 +74,8 @@ class StatementGenerator(
     private fun KtElement.genStmt(): IrStatement =
         try {
             deparenthesize().accept(this@StatementGenerator, null)
+        } catch (e: BackendException) {
+            throw e
         } catch (e: ErrorExpressionException) {
             throw e
         } catch (e: Throwable) {
